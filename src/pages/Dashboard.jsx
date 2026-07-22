@@ -96,69 +96,80 @@ const TABS = [
 
 // ─── Left Sidebar ─────────────────────────────────────────────────────────────
 
-const NavSidebar = ({ activeTab, onTabChange, currentUser, onSettings, onLogout, theme, toggleTheme }) => (
-  <aside className="w-16 flex flex-col items-center py-4 gap-2 bg-slate-950 border-r border-slate-800/60 shrink-0">
-    {/* Logo */}
-    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-3 shadow-lg shadow-indigo-500/30 animate-pulse">
-      <span className="text-white font-extrabold text-sm tracking-tight">NX</span>
-    </div>
+const NavSidebar = ({ activeTab, onTabChange, currentUser, onSettings, onLogout, theme, toggleTheme }) => {
+  const isLight = theme === 'light';
+  return (
+    <aside className={`w-16 flex flex-col items-center py-4 gap-2 border-r shrink-0 transition-colors duration-200 ${
+      isLight ? 'bg-slate-200/80 border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800/60 text-slate-100'
+    }`}>
+      {/* Logo */}
+      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-3 shadow-lg shadow-indigo-500/30 animate-pulse">
+        <span className="text-white font-extrabold text-sm tracking-tight">NX</span>
+      </div>
 
-    <div className="w-8 h-px bg-slate-800 mb-2" />
+      <div className={`w-8 h-px mb-2 ${isLight ? 'bg-slate-300' : 'bg-slate-800'}`} />
 
-    {/* Tab buttons */}
-    {TABS.map(({ id, label, Icon }) => (
-      <button
-        key={id}
-        id={`nav-tab-${id}`}
-        title={label}
-        onClick={() => onTabChange(id)}
-        className={`group relative w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer
-          ${activeTab === id
-            ? 'bg-indigo-500/20 ring-1 ring-indigo-500/40'
-            : 'hover:bg-slate-800/60'}`}>
-        <Icon active={activeTab === id} />
-        {activeTab === id && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-400 rounded-r-full -ml-0.5" />
+      {/* Tab buttons */}
+      {TABS.map(({ id, label, Icon }) => (
+        <button
+          key={id}
+          id={`nav-tab-${id}`}
+          title={label}
+          onClick={() => onTabChange(id)}
+          className={`group relative w-11 h-11 flex items-center justify-center rounded-xl transition-all duration-200 cursor-pointer
+            ${activeTab === id
+              ? 'bg-indigo-500/20 ring-1 ring-indigo-500/40'
+              : (isLight ? 'hover:bg-slate-300/60' : 'hover:bg-slate-800/60')}`}>
+          <Icon active={activeTab === id} />
+          {activeTab === id && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-indigo-400 rounded-r-full -ml-0.5" />
+          )}
+        </button>
+      ))}
+
+      <div className="mt-auto flex flex-col items-center gap-2">
+        {/* Theme Switcher */}
+        <button
+          onClick={toggleTheme}
+          title="Toggle Night / Light Mode"
+          className={`group w-11 h-11 flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+            isLight ? 'hover:bg-slate-300/60' : 'hover:bg-slate-800/60'
+          }`}>
+          {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-500" />}
+        </button>
+
+        {/* Settings button */}
+        <button
+          id="nav-settings-btn"
+          title="Settings & Profile"
+          onClick={onSettings}
+          className={`group w-11 h-11 flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+            isLight ? 'hover:bg-slate-300/60' : 'hover:bg-slate-800/60'
+          }`}>
+          <IconSettings />
+        </button>
+
+        {/* Logout button */}
+        <button
+          id="nav-logout-btn"
+          title="Log Out"
+          onClick={onLogout}
+          className={`group w-11 h-11 flex items-center justify-center rounded-xl transition-all cursor-pointer ${
+            isLight ? 'hover:bg-rose-500/20 text-rose-500' : 'hover:bg-rose-500/10'
+          }`}>
+          <IconLogout />
+        </button>
+
+        {/* User avatar */}
+        {currentUser && (
+          <div title={currentUser.name} className="cursor-default mt-1">
+            <Avatar label={currentUser.avatar || currentUser.name} color={currentUser.color} size="sm" />
+          </div>
         )}
-      </button>
-    ))}
-
-    <div className="mt-auto flex flex-col items-center gap-2">
-      {/* Theme Switcher */}
-      <button
-        onClick={toggleTheme}
-        title="Toggle Night / Light Mode"
-        className="group w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-800/60 transition-all cursor-pointer">
-        {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-400" />}
-      </button>
-
-      {/* Settings button */}
-      <button
-        id="nav-settings-btn"
-        title="Settings & Profile"
-        onClick={onSettings}
-        className="group w-11 h-11 flex items-center justify-center rounded-xl hover:bg-slate-800/60 transition-all cursor-pointer">
-        <IconSettings />
-      </button>
-
-      {/* Logout button */}
-      <button
-        id="nav-logout-btn"
-        title="Log Out"
-        onClick={onLogout}
-        className="group w-11 h-11 flex items-center justify-center rounded-xl hover:bg-rose-500/10 transition-all cursor-pointer">
-        <IconLogout />
-      </button>
-
-      {/* User avatar */}
-      {currentUser && (
-        <div title={currentUser.name} className="cursor-default mt-1">
-          <Avatar label={currentUser.avatar || currentUser.name} color={currentUser.color} size="sm" />
-        </div>
-      )}
-    </div>
-  </aside>
-);
+      </div>
+    </aside>
+  );
+};
 
 // ─── User Search Modal ─────────────────────────────────────────────────────────
 
@@ -239,8 +250,9 @@ const UserSearchModal = ({ isOpen, onClose, onSelectUser }) => {
 
 // ─── Chat List (Middle Panel) ─────────────────────────────────────────────────
 
-const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOpenNewDm, onOpenNewGroup, activeTag, onSelectTag, posts }) => {
+const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOpenNewDm, onOpenNewGroup, activeTag, onSelectTag, posts, theme }) => {
   const [query, setQuery] = useState('');
+  const isLight = theme === 'light';
 
   const trendingTags = useMemo(() => {
     const rawTags = [
@@ -276,24 +288,26 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
   };
 
   return (
-    <div className="w-64 flex flex-col bg-slate-900 border-r border-slate-800/60 shrink-0">
+    <div className={`w-64 flex flex-col border-r transition-colors duration-200 shrink-0 ${
+      isLight ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800/60'
+    }`}>
       {/* Header */}
       <div className="px-4 pt-5 pb-3">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
+          <h2 className={`text-[11px] font-bold uppercase tracking-wider truncate ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
             {tabTitles[activeTab]}
           </h2>
           {activeTab === 'direct' && (
             <button
               onClick={onOpenNewDm}
-              className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shrink-0">
+              className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shrink-0">
               + New DM
             </button>
           )}
           {activeTab === 'groups' && (
             <button
               onClick={onOpenNewGroup}
-              className="flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shrink-0">
+              className="flex items-center gap-1 text-xs font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer shrink-0">
               <Plus className="w-3.5 h-3.5" />
               <span>Group</span>
             </button>
@@ -310,9 +324,11 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={`Search ${activeTab === 'direct' ? 'direct messages' : 'groups & workspaces'}…`}
-              className="w-full bg-slate-800/70 text-slate-200 text-xs rounded-xl pl-9 pr-3 py-2
-                placeholder:text-slate-500 border border-slate-700/50 focus:outline-none
-                focus:ring-1 focus:ring-indigo-500/60 focus:border-indigo-500/40 transition-all"
+              className={`w-full text-xs rounded-xl pl-9 pr-3 py-2 border transition-all ${
+                isLight 
+                  ? 'bg-slate-50 text-slate-800 border-slate-200 placeholder:text-slate-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500' 
+                  : 'bg-slate-800/70 text-slate-200 border-slate-700/50 placeholder:text-slate-500 focus:ring-1 focus:ring-indigo-500/60 focus:border-indigo-500/40'
+              }`}
             />
           </div>
         )}
@@ -330,10 +346,12 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
                   key={tag}
                   onClick={() => onSelectTag(tag)}
                   className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left text-xs font-semibold transition-all cursor-pointer ${
-                    isSelected ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30' : 'hover:bg-slate-800/60 text-slate-300'
+                    isSelected 
+                      ? 'bg-amber-500/15 text-amber-600 border border-amber-500/30' 
+                      : (isLight ? 'hover:bg-slate-100 text-slate-700' : 'hover:bg-slate-800/60 text-slate-300')
                   }`}>
                   <span>{label}</span>
-                  <span className="text-[10px] text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full">{count} {count === 1 ? 'post' : 'posts'}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${isLight ? 'text-slate-600 bg-slate-100' : 'text-slate-500 bg-slate-800'}`}>{count} {count === 1 ? 'post' : 'posts'}</span>
                 </button>
               );
             })}
@@ -341,10 +359,10 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
         ) : loadingChats ? (
           Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl animate-pulse">
-              <div className="w-10 h-10 rounded-xl bg-slate-800" />
+              <div className={`w-10 h-10 rounded-xl ${isLight ? 'bg-slate-200' : 'bg-slate-800'}`} />
               <div className="flex-1 space-y-2">
-                <div className="h-3 bg-slate-800/60 rounded w-3/4" />
-                <div className="h-2.5 bg-slate-800/40 rounded w-1/2" />
+                <div className={`h-3 rounded w-3/4 ${isLight ? 'bg-slate-200' : 'bg-slate-800/60'}`} />
+                <div className={`h-2.5 rounded w-1/2 ${isLight ? 'bg-slate-200/70' : 'bg-slate-800/40'}`} />
               </div>
             </div>
           ))
@@ -357,6 +375,7 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
               chat={chat}
               isActive={chat.id === activeChatId}
               onClick={() => onSelect(chat.id)}
+              theme={theme}
             />
           ))
         )}
@@ -367,30 +386,38 @@ const ChatList = ({ chats, activeChatId, onSelect, activeTab, loadingChats, onOp
 
 // ─── Individual Chat Row ──────────────────────────────────────────────────────
 
-const ChatItem = ({ chat, isActive, onClick }) => (
-  <button
-    id={`chat-item-${chat.id}`}
-    onClick={onClick}
-    className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all duration-150 group cursor-pointer
-      ${isActive
-        ? 'bg-indigo-500/15 ring-1 ring-indigo-500/25'
-        : 'hover:bg-slate-800/50'}`}>
-    <Avatar label={chat.avatar} color={chat.color} size="md" />
-    <div className="flex-1 min-w-0">
-      <div className="flex items-center justify-between gap-1">
-        <span className={`text-sm font-medium truncate ${isActive ? 'text-indigo-300' : 'text-slate-200'}`}>
-          {chat.name}
-        </span>
-        {chat.unread > 0 && (
-          <span className="shrink-0 bg-indigo-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
-            {chat.unread}
+const ChatItem = ({ chat, isActive, onClick, theme }) => {
+  const isLight = theme === 'light';
+  return (
+    <button
+      id={`chat-item-${chat.id}`}
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all duration-150 group cursor-pointer border ${
+        isActive
+          ? (isLight ? 'bg-indigo-50 border-indigo-100/80 shadow-sm' : 'bg-indigo-500/15 border-indigo-500/25')
+          : (isLight ? 'hover:bg-slate-100/80 border-transparent' : 'hover:bg-slate-800/50 border-transparent')
+      }`}>
+      <Avatar label={chat.avatar} color={chat.color} size="md" />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-1">
+          <span className={`text-sm font-semibold truncate ${
+            isActive 
+              ? (isLight ? 'text-indigo-600' : 'text-indigo-300') 
+              : (isLight ? 'text-slate-800' : 'text-slate-200')
+          }`}>
+            {chat.name}
           </span>
-        )}
+          {chat.unread > 0 && (
+            <span className="shrink-0 bg-indigo-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none">
+              {chat.unread}
+            </span>
+          )}
+        </div>
+        <p className={`text-xs truncate mt-0.5 ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>{chat.lastMessage || '...'}</p>
       </div>
-      <p className="text-xs text-slate-500 truncate mt-0.5">{chat.lastMessage || '...'}</p>
-    </div>
-  </button>
-);
+    </button>
+  );
+};
 
 const RenderTicks = ({ status }) => {
   if (status === 'seen') {
@@ -403,21 +430,28 @@ const RenderTicks = ({ status }) => {
 
 // ─── Message Bubble ───────────────────────────────────────────────────────────
 
-const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId }) => {
+const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId, theme }) => {
   const isImage = msg.fileType?.startsWith('image/') || msg.fileUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+  const isLight = theme === 'light';
 
   return (
     <div className={`flex items-end gap-2.5 ${isOwn ? 'flex-row-reverse' : 'flex-row'} group animate-message-up`}>
       {!isOwn && (
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0 mb-1">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mb-1 ${
+          isLight ? 'bg-slate-200 text-slate-700' : 'bg-slate-850 text-slate-300'
+        }`}>
           {msg.senderName?.slice(0, 2).toUpperCase()}
         </div>
       )}
       <div className={`max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-        {!isOwn && <span className="text-xs font-medium text-slate-400 pl-1">{msg.senderName}</span>}
+        {!isOwn && <span className={`text-xs font-medium pl-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>{msg.senderName}</span>}
         
         <div className={`relative p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm space-y-2
-          ${isOwn ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-sm' : 'bg-slate-800/80 text-slate-200 border border-slate-700/40 rounded-bl-sm'}`}>
+          ${isOwn 
+            ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-sm' 
+            : (isLight 
+                ? 'bg-slate-100 text-slate-800 border border-slate-200 rounded-bl-sm' 
+                : 'bg-slate-800/80 text-slate-200 border border-slate-700/40 rounded-bl-sm')}`}>
           
           {msg.text && <p>{msg.text}</p>}
 
@@ -429,7 +463,11 @@ const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId }) => {
                   <img src={msg.fileUrl} alt={msg.fileName || 'Attachment'} className="w-full h-auto max-h-60 object-cover" />
                 </a>
               ) : (
-                <a href={msg.fileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 p-2.5 rounded-xl bg-black/20 hover:bg-black/30 transition-colors border border-white/10">
+                <a href={msg.fileUrl} target="_blank" rel="noreferrer" className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all ${
+                  isLight 
+                    ? 'bg-slate-50 border-slate-200 hover:bg-slate-100/80 text-slate-800' 
+                    : 'bg-black/20 border-white/10 hover:bg-black/30 text-white'
+                }`}>
                   <FileText className="w-5 h-5 shrink-0" />
                   <div className="min-w-0 flex-1 text-xs">
                     <p className="font-bold truncate">{msg.fileName || 'Download Attachment'}</p>
@@ -443,7 +481,7 @@ const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId }) => {
 
           {/* Render Interactive Poll */}
           {msg.poll && (
-            <div className="space-y-2 pt-1 border-t border-white/20">
+            <div className={`space-y-2 pt-1 border-t ${isLight ? 'border-slate-200' : 'border-white/20'}`}>
               <span className="text-xs font-bold uppercase tracking-wider opacity-90">📊 {msg.poll.question}</span>
               <div className="space-y-1.5 mt-2">
                 {msg.poll.options?.map((opt) => {
@@ -453,7 +491,11 @@ const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId }) => {
                     <button
                       key={opt.id}
                       onClick={() => onVotePoll && onVotePoll(msg.id, opt.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium border transition-all cursor-pointer ${hasVoted ? 'bg-white/20 border-white/40' : 'bg-black/20 border-white/10 hover:bg-black/30'}`}>
+                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+                        hasVoted 
+                          ? (isLight ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-white/20 border-white/40') 
+                          : (isLight ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' : 'bg-black/20 border-white/10 hover:bg-black/30')
+                      }`}>
                       <span>{opt.text}</span>
                       <span className="font-bold opacity-80">{votesCount} votes</span>
                     </button>
@@ -475,10 +517,11 @@ const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId }) => {
 
 // ─── Chat Window (Right Panel) ────────────────────────────────────────────────
 
-const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenTasks, onOpenPoll, onBlockUser, onReportUser, onVotePoll, onOpenGroupInfo }) => {
+const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenTasks, onOpenPoll, onBlockUser, onReportUser, onVotePoll, onOpenGroupInfo, theme }) => {
   const [inputText, setInputText] = useState('');
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
+  const isLight = theme === 'light';
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -513,29 +556,39 @@ const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenT
 
   if (!chat) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-slate-900/50">
-        <div className="w-16 h-16 rounded-2xl bg-slate-800/60 flex items-center justify-center">
+      <div className={`flex-1 flex flex-col items-center justify-center gap-4 ${
+        isLight ? 'bg-slate-50' : 'bg-slate-900/50'
+      }`}>
+        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+          isLight ? 'bg-slate-200/50 text-slate-600' : 'bg-slate-800/60 text-indigo-400'
+        }`}>
           <IconMsg active />
         </div>
-        <p className="text-slate-500 text-sm">Select a conversation to start chatting</p>
+        <p className={`text-sm ${isLight ? 'text-slate-600' : 'text-slate-500'}`}>Select a conversation to start chatting</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-slate-900/30">
+    <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 ${
+      isLight ? 'bg-white' : 'bg-slate-900/30'
+    }`}>
       {/* Chat Header */}
-      <header className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800/60 bg-slate-900/60 backdrop-blur-sm shrink-0">
+      <header className={`flex items-center justify-between px-5 py-3.5 border-b shrink-0 ${
+        isLight ? 'border-slate-200 bg-white' : 'border-slate-800/60 bg-slate-900/60 backdrop-blur-sm'
+      }`}>
         <div
           onClick={chat.type !== 'direct' ? onOpenGroupInfo : undefined}
           className={`flex items-center gap-3 ${chat.type !== 'direct' ? 'cursor-pointer group hover:opacity-90' : ''}`}>
           <Avatar label={chat.avatar} color={chat.color} size="md" />
           <div>
-            <h1 className="text-slate-100 font-semibold text-sm group-hover:text-indigo-300 transition-colors flex items-center gap-1.5">
+            <h1 className={`font-semibold text-sm transition-colors flex items-center gap-1.5 ${
+              isLight ? 'text-slate-900 group-hover:text-indigo-600' : 'text-slate-100 group-hover:text-indigo-300'
+            }`}>
               {chat.name}
               {chat.type !== 'direct' && <Info className="w-3.5 h-3.5 text-indigo-400 opacity-80" />}
             </h1>
-            <p className="text-slate-500 text-xs capitalize">
+            <p className={`text-xs capitalize ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>
               {chat.type} · {chat.type !== 'direct' ? 'Click for group members & info' : 'Active now'}
             </p>
           </div>
@@ -543,26 +596,36 @@ const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenT
 
         <div className="flex items-center gap-2">
           {/* Call Buttons */}
-          <button onClick={() => onOpenCall(false)} title="Start Audio Call" className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer">
+          <button onClick={() => onOpenCall(false)} title="Start Audio Call" className={`p-2 rounded-xl transition-colors cursor-pointer ${
+            isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white'
+          }`}>
             <Phone className="w-4 h-4" />
           </button>
-          <button onClick={() => onOpenCall(true)} title="Start Video Call" className="p-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white transition-colors cursor-pointer">
+          <button onClick={() => onOpenCall(true)} title="Start Video Call" className={`p-2 rounded-xl transition-colors cursor-pointer ${
+            isLight ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600' : 'bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white'
+          }`}>
             <VideoIcon className="w-4 h-4" />
           </button>
 
           {/* Task Board */}
-          <button onClick={onOpenTasks} title="Project Tasks & Proof Submissions" className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-emerald-400 transition-colors cursor-pointer">
+          <button onClick={onOpenTasks} title="Project Tasks & Proof Submissions" className={`p-2 rounded-xl transition-colors cursor-pointer ${
+            isLight ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' : 'bg-slate-800/80 hover:bg-slate-700 text-emerald-400'
+          }`}>
             <CheckSquare className="w-4 h-4" />
           </button>
 
           {/* Polls */}
-          <button onClick={onOpenPoll} title="Create Poll / MCQ" className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-purple-400 transition-colors cursor-pointer">
+          <button onClick={onOpenPoll} title="Create Poll / MCQ" className={`p-2 rounded-xl transition-colors cursor-pointer ${
+            isLight ? 'bg-purple-50 hover:bg-purple-100 text-purple-600' : 'bg-slate-800/80 hover:bg-slate-700 text-purple-400'
+          }`}>
             <BarChart2 className="w-4 h-4" />
           </button>
 
           {/* Group Details Drawer Button */}
           {chat.type !== 'direct' && (
-            <button onClick={onOpenGroupInfo} title="Group Details & Members" className="p-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500 text-indigo-300 hover:text-white transition-colors cursor-pointer">
+            <button onClick={onOpenGroupInfo} title="Group Details & Members" className={`p-2 rounded-xl transition-colors cursor-pointer ${
+              isLight ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600' : 'bg-indigo-500/20 hover:bg-indigo-500 text-indigo-300 hover:text-white'
+            }`}>
               <Info className="w-4 h-4" />
             </button>
           )}
@@ -584,26 +647,30 @@ const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenT
       {/* Messages container */}
       <div id="message-list" className="flex-1 overflow-y-auto px-5 py-5 space-y-4 custom-scrollbar">
         <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-slate-800/60" />
-          <span className="text-[11px] text-slate-600 font-medium px-2">Today</span>
-          <div className="flex-1 h-px bg-slate-800/60" />
+          <div className={`flex-1 h-px ${isLight ? 'bg-slate-200' : 'bg-slate-800/60'}`} />
+          <span className={`text-[11px] font-medium px-2 ${isLight ? 'text-slate-400' : 'text-slate-600'}`}>Today</span>
+          <div className={`flex-1 h-px ${isLight ? 'bg-slate-200' : 'bg-slate-800/60'}`} />
         </div>
 
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} msg={msg} isOwn={msg.senderId === currentUserId} onVotePoll={onVotePoll} currentUserId={currentUserId} />
+          <MessageBubble key={msg.id} msg={msg} isOwn={msg.senderId === currentUserId} onVotePoll={onVotePoll} currentUserId={currentUserId} theme={theme} />
         ))}
 
         <div ref={bottomRef} />
       </div>
 
       {/* Message Input */}
-      <div className="px-4 py-3.5 border-t border-slate-800/60 bg-slate-900/60 backdrop-blur-sm shrink-0">
+      <div className={`px-4 py-3.5 border-t shrink-0 ${
+        isLight ? 'border-slate-200 bg-white' : 'border-slate-800/60 bg-slate-900/60 backdrop-blur-sm'
+      }`}>
         <form
           id="send-message-form"
           onSubmit={handleSend}
-          className="flex items-center gap-2 bg-slate-800/60 rounded-2xl border border-slate-700/40
-            px-4 py-2.5 focus-within:ring-1 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/30
-            transition-all duration-200">
+          className={`flex items-center gap-2 rounded-2xl border px-4 py-2.5 transition-all duration-200 ${
+            isLight 
+              ? 'bg-slate-50 border-slate-200 focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500' 
+              : 'bg-slate-800/60 border-slate-700/40 focus-within:ring-1 focus-within:ring-indigo-500/50 focus-within:border-indigo-500/30'
+          }`}>
           
           {/* File Upload Button */}
           <label title="Attach File (PDF, PPT, Image, vCard)" className="p-1.5 rounded-xl hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer">
@@ -618,7 +685,9 @@ const ChatWindow = ({ chat, messages, currentUserId, onSend, onOpenCall, onOpenT
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={`Message ${chat.name}…`}
-            className="flex-1 bg-transparent text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none"
+            className={`flex-1 bg-transparent text-sm focus:outline-none ${
+              isLight ? 'text-slate-800 placeholder:text-slate-400' : 'text-slate-200 placeholder:text-slate-500'
+            }`}
           />
           <button
             type="submit"
@@ -888,11 +957,12 @@ export default function Dashboard({ theme, toggleTheme }) {
         activeTag={activeTag}
         onSelectTag={(tag) => setActiveTag(tag)}
         posts={posts}
+        theme={theme}
       />
 
       {/* Right: Chat Window OR Community Feed */}
       {activeTab === 'trending' ? (
-        <CommunityFeed currentUser={currentUser} activeTag={activeTag} posts={posts} setPosts={setPosts} />
+        <CommunityFeed currentUser={currentUser} activeTag={activeTag} posts={posts} setPosts={setPosts} theme={theme} />
       ) : (
         <ChatWindow
           chat={activeChat}
@@ -906,6 +976,7 @@ export default function Dashboard({ theme, toggleTheme }) {
           onReportUser={handleReportUser}
           onVotePoll={handleVotePoll}
           onOpenGroupInfo={() => setIsGroupInfoOpen(true)}
+          theme={theme}
         />
       )}
 

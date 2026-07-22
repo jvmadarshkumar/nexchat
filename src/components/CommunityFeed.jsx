@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Heart, MessageSquare, Share2, Paperclip, Send, Flame, Image as ImageIcon, Sparkles, User } from 'lucide-react';
 import apiClient, { socket } from '../utils/mockApi';
 
-export default function CommunityFeed({ currentUser, activeTag, posts: externalPosts, setPosts: externalSetPosts }) {
+export default function CommunityFeed({ currentUser, activeTag, posts: externalPosts, setPosts: externalSetPosts, theme }) {
   const [internalPosts, setInternalPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const posts = externalPosts || internalPosts;
   const setPosts = externalSetPosts || setInternalPosts;
+  const isLight = theme === 'light';
 
   // New Post Form State
   const [postText, setPostText] = useState('');
@@ -65,7 +66,11 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMediaUrl(res.fileUrl);
-      setMediaFile(res);
+      setMediaFile({
+        fileName: res.fileName,
+        fileType: res.fileType,
+        fileSize: res.fileSize
+      });
       setUploading(false);
     } catch (err) {
       console.error('[CommunityFeed] File upload failed:', err);
@@ -80,12 +85,11 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
     setPublishing(true);
 
     try {
-      const newPost = await apiClient.post('/posts', {
-        text: postText.trim(),
-        mediaUrl,
+      await apiClient.post('/posts', {
+        text: postText,
+        mediaUrl: mediaUrl,
       });
 
-      setPosts([newPost, ...posts]);
       setPostText('');
       setMediaUrl(null);
       setMediaFile(null);
@@ -137,28 +141,34 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
   });
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-slate-900/30 overflow-y-auto custom-scrollbar">
+    <div className={`flex-1 flex flex-col min-w-0 transition-colors duration-200 overflow-y-auto custom-scrollbar ${
+      isLight ? 'bg-white' : 'bg-slate-900/30'
+    }`}>
       
       {/* Header */}
-      <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-slate-800/60 bg-slate-900/80 backdrop-blur-md">
+      <header className={`sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b ${
+        isLight ? 'border-slate-200 bg-white' : 'border-slate-800/60 bg-slate-900/80 backdrop-blur-md'
+      }`}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
             <Flame className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-slate-100 font-bold text-base flex items-center gap-2">
+            <h1 className={`font-bold text-base flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>
               Community Feed & Trending
               {activeTag && activeTag !== 'all' && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 font-mono">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-500 font-mono">
                   #{activeTag}
                 </span>
               )}
             </h1>
-            <p className="text-slate-500 text-xs">Share updates, announcements, and ideas with the community</p>
+            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>Share updates, announcements, and ideas with the community</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/60 px-3 py-1.5 rounded-full border border-slate-700/40">
+        <div className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border ${
+          isLight ? 'text-slate-600 bg-slate-100 border-slate-200' : 'text-slate-400 bg-slate-800/60 border-slate-700/40'
+        }`}>
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span>Public Feed</span>
         </div>
@@ -168,7 +178,9 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
       <div className="max-w-2xl w-full mx-auto p-4 sm:p-6 space-y-6">
         
         {/* NEW POST COMPOSER */}
-        <form onSubmit={handleCreatePost} className="p-4 sm:p-5 rounded-3xl bg-slate-950/90 border border-slate-800/80 shadow-xl space-y-3">
+        <form onSubmit={handleCreatePost} className={`p-4 sm:p-5 rounded-3xl border shadow-xl space-y-3 ${
+          isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/90 border-slate-800/80'
+        }`}>
           <div className="flex gap-3">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-xs shrink-0 mt-1 shadow-md">
               {currentUser?.avatar || currentUser?.name?.slice(0, 2).toUpperCase() || 'ME'}
@@ -179,16 +191,20 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                 value={postText}
                 onChange={(e) => setPostText(e.target.value)}
                 placeholder="What's happening in your community? Share an update or #hashtag..."
-                className="w-full bg-transparent text-slate-100 placeholder:text-slate-500 text-sm focus:outline-none resize-none"
+                className={`w-full bg-transparent text-sm focus:outline-none resize-none ${
+                  isLight ? 'text-slate-800 placeholder:text-slate-400' : 'text-slate-100 placeholder:text-slate-500'
+                }`}
               />
 
               {/* Media Preview */}
               {mediaUrl && (
-                <div className="relative mt-2 rounded-2xl overflow-hidden border border-slate-800 max-h-64 bg-slate-900">
+                <div className={`relative mt-2 rounded-2xl overflow-hidden border max-h-64 ${
+                  isLight ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'
+                }`}>
                   {mediaFile?.fileType?.startsWith('image/') || mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                     <img src={mediaUrl} alt="Upload preview" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="p-4 text-xs text-indigo-400 flex items-center gap-2">
+                    <div className="p-4 text-xs text-indigo-500 flex items-center gap-2">
                       <ImageIcon className="w-4 h-4" />
                       <span>Attached: {mediaFile?.fileName || mediaUrl}</span>
                     </div>
@@ -204,8 +220,12 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-slate-850 pt-3">
-            <label title="Attach Image or Document" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-indigo-400 text-xs font-medium transition-colors cursor-pointer border border-slate-800">
+          <div className={`flex items-center justify-between border-t pt-3 ${isLight ? 'border-slate-200' : 'border-slate-850'}`}>
+            <label title="Attach Image or Document" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer border ${
+              isLight 
+                ? 'bg-white hover:bg-slate-100 text-slate-600 hover:text-indigo-600 border-slate-200' 
+                : 'bg-slate-900 hover:bg-slate-850 text-slate-400 hover:text-indigo-400 border-slate-800'
+            }`}>
               <Paperclip className="w-4 h-4" />
               <span>{uploading ? 'Uploading...' : 'Attach File'}</span>
               <input type="file" onChange={handleFileUpload} className="hidden" />
@@ -224,13 +244,15 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
         {/* FEED POSTS LIST */}
         {loading ? (
           <div className="text-center py-12 space-y-3">
-            <Flame className="w-8 h-8 text-slate-700 mx-auto animate-bounce" />
+            <Flame className="w-8 h-8 text-slate-400 mx-auto animate-bounce" />
             <p className="text-xs text-slate-500">Loading community updates...</p>
           </div>
         ) : filteredPosts.length === 0 ? (
-          <div className="text-center py-12 p-6 rounded-3xl bg-slate-950/50 border border-slate-800/60 space-y-3">
-            <Flame className="w-10 h-10 text-slate-700 mx-auto" />
-            <h3 className="text-slate-300 font-bold text-sm">No community posts yet</h3>
+          <div className={`text-center py-12 p-6 rounded-3xl border space-y-3 ${
+            isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/50 border-slate-800/60'
+          }`}>
+            <Flame className="w-10 h-10 text-slate-400 mx-auto" />
+            <h3 className={`font-bold text-sm ${isLight ? 'text-slate-800' : 'text-slate-300'}`}>No community posts yet</h3>
             <p className="text-slate-500 text-xs">Be the first to post an update or announcement!</p>
           </div>
         ) : (
@@ -239,7 +261,9 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
             const isOwner = String(post.authorId) === String(currentUser?.id);
 
             return (
-              <article key={post.id} className="p-5 rounded-3xl bg-slate-950/80 border border-slate-800/80 space-y-4 hover:border-slate-750 transition-colors shadow-lg animate-fade-in">
+              <article key={post.id} className={`p-5 rounded-3xl border space-y-4 transition-colors shadow-lg animate-fade-in ${
+                isLight ? 'bg-white border-slate-200 hover:border-slate-300' : 'bg-slate-950/80 border-slate-800/80 hover:border-slate-750'
+              }`}>
                 
                 {/* Post Header */}
                 <div className="flex items-center justify-between">
@@ -249,9 +273,9 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-slate-100">{post.authorName}</h4>
+                        <h4 className={`text-sm font-bold ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>{post.authorName}</h4>
                         {isOwner && (
-                          <span className="text-[10px] bg-indigo-500/20 text-indigo-400 font-bold px-1.5 py-0.5 rounded">You</span>
+                          <span className="text-[10px] bg-indigo-500/20 text-indigo-500 font-bold px-1.5 py-0.5 rounded">You</span>
                         )}
                       </div>
                       <span className="text-[11px] text-slate-500">
@@ -263,16 +287,16 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
 
                 {/* Post Content */}
                 {post.text && (
-                  <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">{post.text}</p>
+                  <p className={`text-sm leading-relaxed whitespace-pre-wrap ${isLight ? 'text-slate-700' : 'text-slate-200'}`}>{post.text}</p>
                 )}
 
                 {/* Attached Media */}
                 {post.mediaUrl && (
-                  <div className="rounded-2xl overflow-hidden border border-slate-800 max-h-96 bg-slate-900">
+                  <div className={`rounded-2xl overflow-hidden border max-h-96 ${isLight ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-900'}`}>
                     {post.mediaUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                       <img src={post.mediaUrl} alt="Post attachment" className="w-full h-full object-cover" />
                     ) : (
-                      <a href={post.mediaUrl} target="_blank" rel="noreferrer" className="p-4 text-xs text-indigo-400 flex items-center gap-2 hover:underline">
+                      <a href={post.mediaUrl} target="_blank" rel="noreferrer" className="p-4 text-xs text-indigo-500 flex items-center gap-2 hover:underline">
                         <ImageIcon className="w-4 h-4" />
                         <span>View Attached File</span>
                       </a>
@@ -281,11 +305,13 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                 )}
 
                 {/* Post Actions (Like, Comment, Share) */}
-                <div className="flex items-center justify-between border-t border-slate-850 pt-3 text-xs text-slate-400">
+                <div className={`flex items-center justify-between border-t pt-3 text-xs ${isLight ? 'border-slate-200 text-slate-500' : 'border-slate-850 text-slate-400'}`}>
                   <button
                     onClick={() => handleLike(post.id)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
-                      isLiked ? 'text-rose-500 bg-rose-500/10 font-bold' : 'hover:text-rose-400 hover:bg-slate-900'
+                      isLiked 
+                        ? 'text-rose-500 bg-rose-500/10 font-bold' 
+                        : (isLight ? 'hover:text-rose-600 hover:bg-slate-100' : 'hover:text-rose-400 hover:bg-slate-900')
                     }`}>
                     <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500' : ''}`} />
                     <span>{(post.likes || []).length} Likes</span>
@@ -293,14 +319,18 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
 
                   <button
                     onClick={() => setActiveCommentPostId(activeCommentPostId === post.id ? null : post.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:text-indigo-400 hover:bg-slate-900 transition-colors cursor-pointer">
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
+                      isLight ? 'hover:text-indigo-600 hover:bg-slate-100' : 'hover:text-indigo-400 hover:bg-slate-900'
+                    }`}>
                     <MessageSquare className="w-4 h-4" />
                     <span>{(post.comments || []).length} Comments</span>
                   </button>
 
                   <button
                     onClick={() => navigator.clipboard.writeText(window.location.href)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:text-emerald-400 hover:bg-slate-900 transition-colors cursor-pointer">
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors cursor-pointer ${
+                      isLight ? 'hover:text-emerald-600 hover:bg-slate-100' : 'hover:text-emerald-400 hover:bg-slate-900'
+                    }`}>
                     <Share2 className="w-4 h-4" />
                     <span>Share</span>
                   </button>
@@ -308,7 +338,7 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
 
                 {/* COMMENTS SECTION */}
                 {activeCommentPostId === post.id && (
-                  <div className="border-t border-slate-850 pt-4 space-y-3 animate-scale-in">
+                  <div className={`border-t pt-4 space-y-3 animate-scale-in ${isLight ? 'border-slate-200' : 'border-slate-850'}`}>
                     
                     {/* Add Comment Input */}
                     <div className="flex gap-2">
@@ -318,7 +348,11 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                         onChange={(e) => setCommentInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
                         placeholder="Write a comment..."
-                        className="flex-1 bg-slate-900 text-xs text-slate-200 rounded-xl px-4 py-2 border border-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className={`flex-1 text-xs rounded-xl px-4 py-2 border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                          isLight 
+                            ? 'bg-slate-50 text-slate-800 border-slate-200 placeholder:text-slate-400' 
+                            : 'bg-slate-900 text-slate-200 border-slate-800 placeholder:text-slate-500'
+                        }`}
                       />
                       <button
                         onClick={() => handleAddComment(post.id)}
@@ -333,16 +367,18 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                         <p className="text-[11px] text-slate-500 text-center py-2">No comments yet. Start the conversation!</p>
                       ) : (
                         post.comments.map((comment) => (
-                          <div key={comment.id} className="flex gap-2.5 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-xs">
+                          <div key={comment.id} className={`flex gap-2.5 p-2.5 rounded-xl border text-xs ${
+                            isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-900/70 border-slate-800 text-slate-300'
+                          }`}>
                             <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center font-bold text-[10px] text-white shrink-0 mt-0.5">
                               {comment.userAvatar || comment.userName?.slice(0, 2).toUpperCase()}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
-                                <span className="font-bold text-slate-300">{comment.userName}</span>
-                                <span className="text-[10px] text-slate-600">{comment.ts}</span>
+                                <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-slate-300'}`}>{comment.userName}</span>
+                                <span className="text-[10px] text-slate-500">{comment.ts}</span>
                               </div>
-                              <p className="text-slate-300 mt-0.5">{comment.text}</p>
+                              <p className={`mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>{comment.text}</p>
                             </div>
                           </div>
                         ))
