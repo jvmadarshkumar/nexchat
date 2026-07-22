@@ -1,0 +1,130 @@
+/*
+ * index.css — NexChat Global Styles
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Tailwind CSS v4 import directive (all-in-one)
+ * Plus: custom scrollbar, Google Font import, and micro-animation utilities
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ── Base reset / font ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #020617; /* slate-950 */
+  color: #f1f5f9;
+}
+
+/* ── Custom Scrollbar ─────────────────────────────────────────────────────────
+   Applied via class="custom-scrollbar" on scrollable containers.
+──────────────────────────────────────────────────────────────────────────── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-700 */
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* slate-600 */
+}
+
+/* ── Smooth transitions on all interactive elements ──────────────────────── */
+button, input, textarea, a {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* ── Textarea resize lock ─────────────────────────────────────────────────── */
+textarea {
+  resize: none;
+}
+
+/* ── Focus ring global override (use Tailwind ring utilities instead) ────── */
+*:focus {
+  outline: none;
+}
+
+/* ── Pulse-once animation for success banner ─────────────────────────────── */
+@keyframes pulse-once {
+  0%   { opacity: 0; transform: translateY(-4px); }
+  30%  { opacity: 1; transform: translateY(0);    }
+  100% { opacity: 1; transform: translateY(0);    }
+}
+.animate-pulse-once {
+  animation: pulse-once 0.4s ease-out forwards;
+}
+
+/* ── Fade-in for message bubbles ─────────────────────────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+.animate-message-up {
+  animation: fade-in-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Spin animation (for save spinner) ──────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Premium scale-in transition ───────────────────────────────────────── */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-scale-in {
+  animation: scale-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Slide-in right transitions (Auth form switch) ────────────────────── */
+@keyframes slide-in-right {
+  from { transform: translateX(12px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-12px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Tactile shake animation for error states ──────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+.animate-shake {
+  animation: shake 0.2s ease-in-out 2;
+}
+
