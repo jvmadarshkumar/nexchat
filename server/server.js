@@ -82,7 +82,7 @@ async function syncFromAtlas() {
   const db = {
     currentUser: null,
     registeredUsers: users.map(u => ({
-      id: isNaN(u.id) ? u.id : Number(u.id),
+      id: u.id ? (isNaN(u.id) ? u.id : Number(u.id)) : String(u._id),
       name: u.name,
       email: u.email,
       password: u.password,
@@ -93,20 +93,20 @@ async function syncFromAtlas() {
       blockedUsers: u.blockedUsers
     })),
     chats: communities.map(c => ({
-      id: isNaN(c.id) ? c.id : Number(c.id),
+      id: c.id ? (isNaN(c.id) ? c.id : Number(c.id)) : String(c._id),
       name: c.name,
       description: c.description,
       avatar: c.avatar,
       color: c.color,
       type: c.type,
-      creator: isNaN(c.creator) ? c.creator : Number(c.creator),
+      creator: c.creator ? (isNaN(c.creator) ? c.creator : Number(c.creator)) : '',
       coAdmins: (c.coAdmins || []).map(x => isNaN(x) ? x : Number(x)),
       members: (c.members || []).map(x => isNaN(x) ? x : Number(x))
     })),
     messages: {},
     tasks: tasks.map(t => ({
-      id: t.id || `task-${t._id}`,
-      communityId: isNaN(t.communityId) ? t.communityId : Number(t.communityId),
+      id: t.id || String(t._id),
+      communityId: t.communityId ? (isNaN(t.communityId) ? t.communityId : Number(t.communityId)) : '',
       title: t.title,
       description: t.description,
       externalPlatformUrl: t.externalPlatformUrl,
@@ -115,7 +115,7 @@ async function syncFromAtlas() {
       status: t.status,
       submissions: (t.submissions || []).map(s => ({
         id: s.id,
-        userId: isNaN(s.userId) ? s.userId : Number(s.userId),
+        userId: s.userId ? (isNaN(s.userId) ? s.userId : Number(s.userId)) : '',
         userName: s.userName,
         proofScreenshotUrl: s.proofScreenshotUrl,
         fileUrl: s.fileUrl,
@@ -125,16 +125,16 @@ async function syncFromAtlas() {
       }))
     })),
     reports: reports.map(r => ({
-      id: r.id || `report-${r._id}`,
-      reporterId: isNaN(r.reporterId) ? r.reporterId : Number(r.reporterId),
-      reportedUserId: isNaN(r.reportedUserId) ? r.reportedUserId : Number(r.reportedUserId),
+      id: r.id || String(r._id),
+      reporterId: r.reporterId ? (isNaN(r.reporterId) ? r.reporterId : Number(r.reporterId)) : '',
+      reportedUserId: r.reportedUserId ? (isNaN(r.reportedUserId) ? r.reportedUserId : Number(r.reportedUserId)) : '',
       reason: r.reason,
       details: r.details,
       status: r.status
     })),
     posts: posts.map(p => ({
-      id: p.id || `post-${p._id}`,
-      authorId: isNaN(p.authorId) ? p.authorId : Number(p.authorId),
+      id: p.id || String(p._id),
+      authorId: p.authorId ? (isNaN(p.authorId) ? p.authorId : Number(p.authorId)) : '',
       authorName: p.authorName,
       authorAvatar: p.authorAvatar,
       authorColor: p.authorColor,
@@ -143,7 +143,7 @@ async function syncFromAtlas() {
       likes: (p.likes || []).map(x => isNaN(x) ? x : Number(x)),
       comments: (p.comments || []).map(c => ({
         id: c.id,
-        userId: isNaN(c.userId) ? c.userId : Number(c.userId),
+        userId: c.userId ? (isNaN(c.userId) ? c.userId : Number(c.userId)) : '',
         userName: c.userName,
         userAvatar: c.userAvatar,
         text: c.text,
