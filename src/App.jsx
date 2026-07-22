@@ -87,11 +87,30 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center animate-pulse">
-          <span className="text-white font-black text-xs">NX</span>
+      <div className="min-h-screen w-screen bg-slate-950 flex flex-col items-center justify-center gap-6 select-none overflow-hidden relative">
+        {/* Glow backdrop decorative */}
+        <div className="absolute w-[300px] h-[300px] bg-gradient-to-tr from-indigo-500/10 to-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+        {/* Outer concentric pulsing waves wrapper */}
+        <div className="relative w-28 h-28 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-indigo-500/30 blur-md animate-loading-wave-1" />
+          <div className="absolute inset-0 rounded-full bg-purple-500/30 blur-md animate-loading-wave-2" />
+          <div className="absolute inset-0 rounded-full bg-pink-500/20 blur-md animate-loading-wave-3" />
+
+          {/* Slow rotating ring */}
+          <div className="absolute inset-2 rounded-full border border-indigo-500/30 border-t-indigo-500 animate-spin-slow" />
+
+          {/* Glowing central Logo container */}
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-xl shadow-indigo-500/40 relative z-10">
+            <span className="text-white font-black text-sm tracking-tighter animate-pulse">NX</span>
+          </div>
         </div>
-        <p className="text-slate-500 text-xs tracking-wider uppercase font-semibold">Connecting to NexChat…</p>
+
+        {/* Text description with letter glow */}
+        <div className="flex flex-col items-center gap-1.5 z-10">
+          <p className="text-indigo-400 text-xs tracking-widest uppercase font-bold animate-text-glow">Connecting to NexChat</p>
+          <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Please wait…</span>
+        </div>
       </div>
     );
   }

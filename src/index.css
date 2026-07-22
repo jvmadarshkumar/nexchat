@@ -128,3 +128,44 @@ textarea {
   animation: shake 0.2s ease-in-out 2;
 }
 
+/* ── Concentric Glowing Waves / Loading Animation ── */
+@keyframes loading-wave {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0.0;
+  }
+}
+.animate-loading-wave-1 {
+  animation: loading-wave 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+.animate-loading-wave-2 {
+  animation: loading-wave 2s cubic-bezier(0.16, 1, 0.3, 1) infinite 0.6s;
+}
+.animate-loading-wave-3 {
+  animation: loading-wave 2s cubic-bezier(0.16, 1, 0.3, 1) infinite 1.2s;
+}
+
+@keyframes spinner-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spinner-slow 4s linear infinite;
+}
+
+@keyframes text-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.animate-text-glow {
+  animation: text-glow 1.5s ease-in-out infinite;
+}
+
