@@ -70,7 +70,67 @@ async function syncFromAtlas() {
   const messages = await Message.find({}).lean();
   const tasks = await Task.find({}).lean();
   const reports = await Report.find({}).lean();
-  const posts = await Post.find({}).lean();
+  
+  let posts = await Post.find({}).lean();
+  if (posts.length === 0) {
+    console.log('Seeding MongoDB Atlas with initial trending posts...');
+    const seedPosts = [
+      {
+        id: "post-1",
+        authorId: "6a603a5fc0ffa1385e89ec2b",
+        authorName: "ADARSH KUMAR",
+        authorAvatar: "AD",
+        authorColor: "#4F46E5",
+        text: "Super excited to launch #nexchat today! Built this monorepo to make team collaboration lightning-fast. Check it out and let us know your feedback! 🚀",
+        likes: [],
+        comments: []
+      },
+      {
+        id: "post-2",
+        authorId: "6a603a5fc0ffa1385e89ec2c",
+        authorName: "user",
+        authorAvatar: "US",
+        authorColor: "#06B6D4",
+        text: "Just pushed the new animated loading screens to the main branch. Modern UI #design rules! 🎨✨",
+        likes: [],
+        comments: []
+      },
+      {
+        id: "post-3",
+        authorId: "6a603a5fc0ffa1385e89ec2b",
+        authorName: "ADARSH KUMAR",
+        authorAvatar: "AD",
+        authorColor: "#4F46E5",
+        text: "Exploring the new serverless setup on Render. Backend #tech stack scaling flawlessly. ⚡ #nexchat",
+        likes: [],
+        comments: []
+      },
+      {
+        id: "post-4",
+        authorId: "6a603a5fc0ffa1385e89ec2b",
+        authorName: "ADARSH KUMAR",
+        authorAvatar: "AD",
+        authorColor: "#4F46E5",
+        text: "Official #announcements: The first project milestone review will be conducted tomorrow at 10 AM. All members please submit task proofs before the deadline.",
+        likes: [],
+        comments: []
+      },
+      {
+        id: "post-5",
+        authorId: "6a603a5fc0ffa1385e89ec2c",
+        authorName: "user",
+        authorAvatar: "US",
+        authorColor: "#06B6D4",
+        text: "Excited to connect with everyone from #lpu here on NexChat! Let's build something awesome together. 🏫📚",
+        likes: [],
+        comments: []
+      }
+    ];
+    for (const p of seedPosts) {
+      await Post.create(p);
+    }
+    posts = await Post.find({}).lean();
+  }
 
   if (users.length === 0) {
     console.log('Seeding MongoDB Atlas from local db.json...');
