@@ -233,3 +233,34 @@ button[title*="Log"]:hover svg, button[id*="logout"]:hover svg {
   color: var(--color-indigo-500, #6366f1);
 }
 
+/* ── Sidebar Tab Specific Micro-Animations ── */
+
+/* 1. Chat tab: wiggle */
+button[id*="tab-direct"]:hover svg {
+  animation: tab-chat-wiggle 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes tab-chat-wiggle {
+  10%, 90% { transform: scale(1.15) translate3d(-1px, 0, 0); }
+  20%, 80% { transform: scale(1.15) translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: scale(1.15) translate3d(-2px, 0, 0); }
+  40%, 60% { transform: scale(1.15) translate3d(2px, 0, 0); }
+}
+
+/* 2. Groups tab: subtle up-down bounce */
+button[id*="tab-groups"]:hover svg {
+  animation: tab-groups-bounce 0.5s ease-in-out infinite alternate;
+}
+@keyframes tab-groups-bounce {
+  0% { transform: scale(1.15) translateY(0); }
+  100% { transform: scale(1.15) translateY(-2.5px); }
+}
+
+/* 3. Trending Flame tab: fire flicker scale & orange/red glow shadow */
+button[id*="tab-trending"]:hover svg {
+  animation: tab-flame-flicker 0.6s ease-in-out infinite alternate;
+}
+@keyframes tab-flame-flicker {
+  0% { transform: scale(1.15) rotate(-3deg); filter: drop-shadow(0 0 1px rgba(245, 158, 11, 0.4)); }
+  100% { transform: scale(1.22) rotate(3deg); filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.7)); }
+}
+
