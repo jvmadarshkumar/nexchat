@@ -8,10 +8,10 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 // ─── Axios Instance ────────────────────────────────────────────────────────────
-
+const API_URL = import.meta.env.VITE_API_URL || '';
 const apiClient = axios.create({
-  baseURL: '/api',
-  timeout: 5000,
+  baseURL: import.meta.env.DEV ? '/api' : (API_URL ? `${API_URL}/api` : '/api'),
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
 
 // ─── Socket.IO Client Setup ──────────────────────────────────────────────────
 
-export const socket = io({
+export const socket = io(import.meta.env.DEV ? '/' : (API_URL || '/'), {
   autoConnect: false, // Wait until we connect on Dashboard mount
 });
 
