@@ -82,7 +82,7 @@ async function syncFromAtlas() {
   const db = {
     currentUser: null,
     registeredUsers: users.map(u => ({
-      id: u.id ? (isNaN(u.id) ? u.id : Number(u.id)) : String(u._id),
+      id: (u.id && u.id !== 'undefined') ? (isNaN(u.id) ? u.id : Number(u.id)) : String(u._id),
       name: u.name,
       email: u.email,
       password: u.password,
@@ -93,7 +93,7 @@ async function syncFromAtlas() {
       blockedUsers: u.blockedUsers
     })),
     chats: communities.map(c => ({
-      id: c.id ? (isNaN(c.id) ? c.id : Number(c.id)) : String(c._id),
+      id: (c.id && c.id !== 'undefined') ? (isNaN(c.id) ? c.id : Number(c.id)) : String(c._id),
       name: c.name,
       description: c.description,
       avatar: c.avatar,
@@ -105,7 +105,7 @@ async function syncFromAtlas() {
     })),
     messages: {},
     tasks: tasks.map(t => ({
-      id: t.id || String(t._id),
+      id: (t.id && t.id !== 'undefined') ? t.id : String(t._id),
       communityId: t.communityId ? (isNaN(t.communityId) ? t.communityId : Number(t.communityId)) : '',
       title: t.title,
       description: t.description,
@@ -125,7 +125,7 @@ async function syncFromAtlas() {
       }))
     })),
     reports: reports.map(r => ({
-      id: r.id || String(r._id),
+      id: (r.id && r.id !== 'undefined') ? r.id : String(r._id),
       reporterId: r.reporterId ? (isNaN(r.reporterId) ? r.reporterId : Number(r.reporterId)) : '',
       reportedUserId: r.reportedUserId ? (isNaN(r.reportedUserId) ? r.reportedUserId : Number(r.reportedUserId)) : '',
       reason: r.reason,
@@ -133,7 +133,7 @@ async function syncFromAtlas() {
       status: r.status
     })),
     posts: posts.map(p => ({
-      id: p.id || String(p._id),
+      id: (p.id && p.id !== 'undefined') ? p.id : String(p._id),
       authorId: p.authorId ? (isNaN(p.authorId) ? p.authorId : Number(p.authorId)) : '',
       authorName: p.authorName,
       authorAvatar: p.authorAvatar,
@@ -676,9 +676,9 @@ function getUserFromAuthHeader(req, registeredUsers, defaultUser) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer mock-jwt-token-')) {
     const parts = authHeader.split('-');
-    const userId = parseInt(parts[3], 10);
-    if (!isNaN(userId)) {
-      const user = registeredUsers.find((u) => u.id === userId);
+    const userIdVal = parts[3];
+    if (userIdVal) {
+      const user = registeredUsers.find((u) => String(u.id) === String(userIdVal));
       if (user) {
         return {
           id: user.id,
@@ -751,7 +751,7 @@ app.get('/api/users/search', async (req, res) => {
   const currentUserId = user?.id;
 
   const matches = db.registeredUsers
-    .filter((u) => u.id !== currentUserId)
+    .filter((u) => String(u.id) !== String(currentUserId))
     .filter((u) => !query || u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query))
     .map((u) => ({
       id: u.id,
