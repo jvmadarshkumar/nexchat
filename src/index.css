@@ -169,3 +169,67 @@ textarea {
   animation: text-glow 1.5s ease-in-out infinite;
 }
 
+/* ── Interactive Icon Animations & Micro-Interactions ── */
+button svg, a svg, label svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s ease, stroke-width 0.15s ease;
+}
+
+/* Default hover scale */
+button:hover svg, a:hover svg, label:hover svg {
+  transform: scale(1.15);
+}
+
+/* Active click pop */
+button:active svg, a:active svg, label:active svg {
+  transform: scale(0.9);
+}
+
+/* Call/Video icon hover: smooth tilt pulse */
+button[title*="Call"]:hover svg, button[title*="Video"]:hover svg {
+  animation: icon-call-wiggle 0.5s ease-in-out infinite alternate;
+}
+@keyframes icon-call-wiggle {
+  0% { transform: scale(1.15) rotate(-6deg); }
+  100% { transform: scale(1.15) rotate(6deg); }
+}
+
+/* Task checklist check icon hover: bounce check mark */
+button[title*="Task"]:hover svg {
+  animation: icon-task-bounce 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) infinite alternate;
+}
+@keyframes icon-task-bounce {
+  0% { transform: translateY(0) scale(1.15); }
+  100% { transform: translateY(-3px) scale(1.15); }
+}
+
+/* Poll chart icon hover: slide up slightly */
+button[title*="Poll"]:hover svg {
+  transform: scale(1.15) translateY(-2px);
+}
+
+/* Paperclip attachment icon hover: rotate tilt */
+label[title*="Attach"]:hover svg, label[title*="File"]:hover svg {
+  transform: scale(1.15) rotate(25deg);
+}
+
+/* Send button icon hover: translate sliding effect */
+button[id*="send"]:hover svg, button[type="submit"]:hover svg {
+  transform: scale(1.15) translateX(3px) translateY(-1px);
+}
+
+/* Settings cog icon hover: smooth rotation */
+button[title*="Settings"]:hover svg, button[id*="settings"]:hover svg {
+  transform: scale(1.15) rotate(45deg);
+}
+
+/* Log out icon hover: slide out */
+button[title*="Log"]:hover svg, button[id*="logout"]:hover svg {
+  transform: scale(1.15) translateX(-3px);
+}
+
+/* Search bar focus: search icon pop */
+.relative:focus-within svg {
+  transform: scale(1.2) rotate(-5deg);
+  color: var(--color-indigo-500, #6366f1);
+}
+
