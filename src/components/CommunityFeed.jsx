@@ -2,6 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Heart, MessageSquare, Share2, Paperclip, Send, Flame, Image as ImageIcon, Sparkles, User } from 'lucide-react';
 import apiClient, { socket } from '../utils/mockApi';
 
+const formatLocalTime = (ts) => {
+  if (!ts) return '';
+  try {
+    const tsStr = String(ts);
+    // If it is a pre-formatted time like "10:30 AM" from seed data, return it directly
+    if (
+      tsStr.includes(':') &&
+      (tsStr.toLowerCase().includes('am') ||
+        tsStr.toLowerCase().includes('pm') ||
+        (!tsStr.includes('-') && !tsStr.includes('T') && !tsStr.includes('t')))
+    ) {
+      return tsStr;
+    }
+    const date = new Date(ts);
+    if (isNaN(date.getTime())) return tsStr;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return String(ts);
+  }
+};
+
 export default function CommunityFeed({ currentUser, activeTag, posts: externalPosts, setPosts: externalSetPosts, theme }) {
   const [internalPosts, setInternalPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -376,7 +397,7 @@ export default function CommunityFeed({ currentUser, activeTag, posts: externalP
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
                                 <span className={`font-bold ${isLight ? 'text-slate-800' : 'text-slate-300'}`}>{comment.userName}</span>
-                                <span className="text-[10px] text-slate-500">{comment.ts}</span>
+                                <span className="text-[10px] text-slate-500">{formatLocalTime(comment.ts)}</span>
                               </div>
                               <p className={`mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>{comment.text}</p>
                             </div>

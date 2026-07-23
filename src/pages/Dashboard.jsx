@@ -428,6 +428,27 @@ const RenderTicks = ({ status }) => {
   return <span title="Sent" className="text-slate-300 font-extrabold text-[12px] leading-none select-none ml-1">✓</span>;
 };
 
+const formatLocalTime = (ts) => {
+  if (!ts) return '';
+  try {
+    const tsStr = String(ts);
+    // If it is a pre-formatted time like "10:30 AM" from seed data, return it directly
+    if (
+      tsStr.includes(':') &&
+      (tsStr.toLowerCase().includes('am') ||
+        tsStr.toLowerCase().includes('pm') ||
+        (!tsStr.includes('-') && !tsStr.includes('T') && !tsStr.includes('t')))
+    ) {
+      return tsStr;
+    }
+    const date = new Date(ts);
+    if (isNaN(date.getTime())) return tsStr;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return String(ts);
+  }
+};
+
 // ─── Message Bubble ───────────────────────────────────────────────────────────
 
 const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId, theme }) => {
@@ -507,7 +528,7 @@ const MessageBubble = ({ msg, isOwn, onVotePoll, currentUserId, theme }) => {
         </div>
         
         <div className="flex items-center gap-1 px-1">
-          <span className="text-[10px] text-slate-500">{msg.ts}</span>
+          <span className="text-[10px] text-slate-500">{formatLocalTime(msg.ts)}</span>
           {isOwn && <RenderTicks status={msg.status || 'delivered'} />}
         </div>
       </div>

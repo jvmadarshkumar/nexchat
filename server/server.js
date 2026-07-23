@@ -829,17 +829,21 @@ function formatChatForUser(chat, currentUser, registeredUsers) {
   if (chat.type !== 'direct') return chat;
 
   const currentIdStr = String(currentUser?.id);
-  const isParticipant = chat.participants && Array.isArray(chat.participants)
-    ? chat.participants.map(String).includes(currentIdStr)
-    : (String(chat.targetUserId) === currentIdStr || chat.participants?.length === undefined);
+  const participants = (chat.members && chat.members.length > 0)
+    ? chat.members
+    : ((chat.participants && chat.participants.length > 0) ? chat.participants : []);
 
-  if (!isParticipant && chat.participants && chat.participants.length > 0) {
+  const isParticipant = participants.map(String).includes(currentIdStr) ||
+    (chat.targetUserId && String(chat.targetUserId) === currentIdStr) ||
+    participants.length === 0;
+
+  if (!isParticipant && participants.length > 0) {
     return null; // Don't expose private direct chats to non-participants
   }
 
   let otherUserId = null;
-  if (chat.participants && Array.isArray(chat.participants)) {
-    otherUserId = chat.participants.find((p) => String(p) !== currentIdStr);
+  if (participants.length > 0) {
+    otherUserId = participants.find((p) => String(p) !== currentIdStr);
   } else if (chat.targetUserId && String(chat.targetUserId) !== currentIdStr) {
     otherUserId = chat.targetUserId;
   }
@@ -878,9 +882,15 @@ app.post('/api/chats/direct', async (req, res) => {
   // Check if a direct chat room already exists between user.id and targetUser.id
   let chat = db.chats.find((c) => {
     if (c.type !== 'direct') return false;
-    if (c.participants && Array.isArray(c.participants)) {
-      return c.participants.map(String).includes(String(user.id)) && c.participants.map(String).includes(String(targetUser.id));
+    
+    const participants = (c.members && c.members.length > 0)
+      ? c.members
+      : ((c.participants && c.participants.length > 0) ? c.participants : []);
+
+    if (participants.length > 0) {
+      return participants.map(String).includes(String(user.id)) && participants.map(String).includes(String(targetUser.id));
     }
+
     return (String(c.targetUserId) === String(targetUser.id) || String(c.targetUserId) === String(user.id)) ||
            (c.name.toLowerCase() === targetUser.name.toLowerCase() || c.name.toLowerCase() === user.name.toLowerCase());
   });
@@ -891,6 +901,7 @@ app.post('/api/chats/direct', async (req, res) => {
       id: nextId,
       type: 'direct',
       participants: [user.id, targetUser.id],
+      members: [String(user.id), String(targetUser.id)],
       targetUserId: targetUser.id,
       name: targetUser.name,
       avatar: targetUser.avatar || targetUser.name.slice(0, 2).toUpperCase(),
@@ -903,6 +914,7 @@ app.post('/api/chats/direct', async (req, res) => {
     await writeDb(db);
   } else {
     chat.participants = [user.id, targetUser.id];
+    chat.members = [String(user.id), String(targetUser.id)];
     await writeDb(db);
   }
 
@@ -1264,7 +1276,7 @@ app.post('/api/posts/:id/comments', async (req, res) => {
     userName: user.name,
     userAvatar: user.avatar || user.name.slice(0, 2).toUpperCase(),
     text: text.trim(),
-    ts: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    ts: new Date().toISOString(),
   };
 
   post.comments.push(comment);
@@ -1352,7 +1364,7 @@ app.post('/api/polls', async (req, res) => {
     senderName: user.name,
     text: `📊 Poll: ${question}`,
     poll: pollData,
-    ts: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    ts: new Date().toISOString(),
   };
 
   db.messages[chatId] = db.messages[chatId] || [];
@@ -1439,8 +1451,7 @@ app.post('/api/chats/:chatId/messages', async (req, res) => {
   }
 
   const existing = db.messages[chatId] || [];
-  const now = new Date();
-  const ts = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const ts = new Date().toISOString();
 
   const newMsg = {
     id: `m-${Date.now()}`,
