@@ -443,7 +443,7 @@ const formatLocalTime = (ts) => {
     }
     const date = new Date(ts);
     if (isNaN(date.getTime())) return tsStr;
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   } catch (e) {
     return String(ts);
   }
