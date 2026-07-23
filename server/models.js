@@ -43,7 +43,7 @@ const MessageSchema = new mongoose.Schema({
     }],
   },
   status: { type: String, default: 'delivered', enum: ['sent', 'delivered', 'seen'] },
-  ts: { type: String, default: () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+  ts: { type: String, default: () => new Date().toISOString() },
 }, { timestamps: true });
 
 const TaskSchema = new mongoose.Schema({
@@ -90,7 +90,7 @@ const PostSchema = new mongoose.Schema({
     userName: String,
     userAvatar: String,
     text: String,
-    ts: { type: String, default: () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+    ts: { type: String, default: () => new Date().toISOString() },
   }],
 }, { timestamps: true });
 
